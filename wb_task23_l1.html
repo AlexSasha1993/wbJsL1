@@ -1,0 +1,89 @@
+<!-- Анализатор сложности пароля: создайте функцию, которая оценивает сложность введенного пользователем пароля. Необходимо анализировать длину пароля, использование различных символов, наличие чисел и букв в разных регистрах. Выведите пользователю оценку сложности пароля и предложите улучшения, если пароль слишком слабый. -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input id="input" />
+    <div id="outputs">
+      <p id="outputLetters"></p>
+      <p id="outputNumbers"></p>
+      <p id="outputSpecial"></p>
+      <p id="outputHugeLetters"></p>
+      <p id="outputLength"></p>
+      <p id="outputAll"></p>
+    </div>
+
+    <script>
+      const input = document.querySelector('#input');
+      const outputLetters = document.querySelector('#outputLetters');
+      const outputNumbers = document.querySelector('#outputNumbers');
+      const outputSpecial = document.querySelector('#outputSpecial');
+      const outputHugeLetters = document.querySelector('#outputHugeLetters');
+      const ououtputAlltput = document.querySelector('#outoutputAllput');
+      const outputLength = document.querySelector('#outputLength');
+      const outputAll = document.querySelector('#outputAll');
+      const outputs = document.querySelector('#outputs');
+
+      let check = (value) => {
+        if (value.length === 0) {
+          outputs.style.display = 'none';
+        } else {
+          outputs.style.display = 'block';
+        }
+
+        if (value.length < 5) {
+          outputLength.textContent = 'Слишком короткий пароль';
+          outputLength.style.color = 'red';
+        } else {
+          outputLength.textContent = '';
+        }
+        if (!value.match(/[A-Z]/g)) {
+          outputHugeLetters.textContent = 'Нет заглавных букв';
+          outputHugeLetters.style.color = 'red';
+        } else {
+          outputHugeLetters.textContent = '';
+        }
+        if (!value.match(/[0-9]/g)) {
+          outputNumbers.textContent = 'В пароле нет цифр';
+          outputNumbers.style.color = 'red';
+        } else {
+          outputNumbers.textContent = '';
+        }
+        if (!value.match(/(?=.*[!@#$%^&*])/g)) {
+          outputSpecial.textContent = 'Нет спец. символов';
+          outputSpecial.style.color = 'red';
+        } else {
+          outputSpecial.textContent = '';
+        }
+        if (!value.match(/[a-z]/g)) {
+          outputLetters.textContent = 'Нет строчных букв';
+          outputLetters.style.color = 'red';
+        } else {
+          outputLetters.textContent = '';
+        }
+
+        if (
+          value.length > 5 &&
+          value.match(/[A-Z]/g) &&
+          value.match(/[0-9]/g) &&
+          value.match(/(?=.*[!@#$%^&*])/g)
+        ) {
+          outputAll.textContent = 'Сильный пароль';
+          outputAll.style.color = 'green';
+        } else {
+          outputAll.textContent =
+            'Пароль слишком слабый, следуй инструкции выше';
+          outputAll.style.color = 'orange';
+        }
+      };
+
+      input.addEventListener('input', () => {
+        check(input.value);
+      });
+    </script>
+  </body>
+</html>

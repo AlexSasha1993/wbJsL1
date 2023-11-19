@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      #input {
+        width: 100%;
+        display: block;
+        border-radius: 15px;
+        border: 2px solid green;
+      }
+      #output {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        border-radius: 15px;
+      }
+      .conteiner {
+        width: 500px;
+      }
+    </style>
+    <title>Document</title>
+  </head>
+
+  <body>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=cc3a364b-4ea5-4c20-962a-523770b5a5df&lang=ru_RU"></script>
+
+    <div class="conteiner">
+      <input id="input" />
+      <div id="output"></div>
+    </div>
+    <script defer>
+      const input = document.querySelector('#input');
+      const output = document.querySelector('#output');
+
+      ymaps.ready(() => {
+        const addElement = (element) => {
+          output.append(element);
+        };
+
+        const createElement = (data) => {
+          const info = document.createElement('div');
+          info.textContent = data;
+          addElement(info);
+        };
+
+        const geocode = (address) => {
+          ymaps.geocode(address).then((res) => {
+            console.log(res);
+            if (res.geoObjects.getLength() < 1) {
+              createElement('совпадения не найдено');
+              return;
+            }
+
+            res.geoObjects.each((info) => {
+              createElement(info.getAddressLine());
+            });
+          });
+        };
+
+        const addInput = () => {
+          let timer;
+          input.addEventListener('input', () => {
+            clearTimeout(timer);
+            output.innerHTML = '';
+            timer = setTimeout(() => {
+              geocode(input.value);
+            }, 2000);
+          });
+        };
+
+        addInput();
+      });
+    </script>
+  </body>
+</html>

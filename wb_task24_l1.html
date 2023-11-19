@@ -1,0 +1,212 @@
+<!--  Разработайте страницу, отображающую таблицу с данными. Данные необходимо подгружать из этого источника. http://www.filltext.com/?rows=1000&fname=%7BfirstName%7D&lname=%7BlastName%7D&tel=%7Bphone%7Cformat%7D&address=%7BstreetAddress%7D&city=%7Bcity%7D&state=%7BusState%7Cabbr%7D&zip=%7Bzip%7D&pretty=true
+  
+
+Требования:
+    • данные должны загружаться при загрузке страницы
+    • необходимо реализовать сортировку по убыванию и по возрастания для всех колонок
+    • необходимо реализовать клиентскую пагинацию (50 элементов на странице) -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Table</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      th {
+        cursor: pointer;
+      }
+
+      .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+      }
+
+      .pagination li {
+        margin: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Таблица для отображения данных -->
+    <table id="dataTable">
+      <thead>
+        <!-- Заголовки столбцов, каждый с атрибутом onclick, который вызывает функцию сортировки для соответствующего столбца -->
+        <tr>
+          <th onclick="sortTable(0)">First Name</th>
+          <th onclick="sortTable(1)">Last Name</th>
+          <th onclick="sortTable(2)">Phone</th>
+          <th onclick="sortTable(3)">Address</th>
+          <th onclick="sortTable(4)">City</th>
+          <th onclick="sortTable(5)">State</th>
+          <th onclick="sortTable(6)">ZIP</th>
+        </tr>
+      </thead>
+      <!-- Тело таблицы, где будут отображаться данные -->
+      <tbody></tbody>
+    </table>
+
+    <!-- Список для отображения пагинации -->
+    <ul class="pagination" id="pagination"></ul>
+
+    <!-- JavaScript-скрипт -->
+    <script>
+      // Событие, которое срабатывает после полной загрузки страницы
+      document.addEventListener('DOMContentLoaded', function () {
+        // Загрузка данных при запуске страницы
+        loadData();
+      });
+
+      // Массив для хранения исходных данных
+      let originalData = [];
+      // Текущая страница
+      let currentPage = 1;
+
+      // Функция для загрузки данных с сервера
+      function loadData() {
+        fetch(
+          'http://www.filltext.com/?rows=1000&fname={firstName}&lname={lastName}&tel={phone|format}&address={streetAddress}&city={city}&state={usState|abbr}&zip={zip}&pretty=true'
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            // Сохранение исходных данных
+            originalData = [...data];
+            // Отображение данных текущей страницы
+            paginate(currentPage);
+          });
+      }
+
+      // Функция для отображения данных в таблице
+      function displayData(data) {
+        // Получение ссылки на tbody элемент таблицы
+        const tableBody = document.querySelector('#dataTable tbody');
+        // Очистка тела таблицы
+        tableBody.innerHTML = '';
+
+        // Создание фрагмента для эффективного добавления строк в таблицу
+        const fragment = document.createDocumentFragment();
+
+        // Перебор данных и создание строк для каждого элемента
+        data.forEach((item) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+          <td>${item.fname}</td>
+          <td>${item.lname}</td>
+          <td>${item.tel}</td>
+          <td>${item.address}</td>
+          <td>${item.city}</td>
+          <td>${item.state}</td>
+          <td>${item.zip}</td>
+        `;
+          fragment.appendChild(row);
+        });
+
+        // Добавление фрагмента в тело таблицы
+        tableBody.appendChild(fragment);
+      }
+
+      // Функция для настройки пагинации
+      function setupPagination(totalItems) {
+        const itemsPerPage = 50;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        // Получение ссылки на элемент пагинации
+        const paginationElement = document.querySelector('#pagination');
+        // Очистка пагинации
+        paginationElement.innerHTML = '';
+
+        // Создание элементов списка для каждой страницы
+        for (let i = 1; i <= totalPages; i++) {
+          const li = document.createElement('li');
+          li.textContent = i;
+          // Добавление обработчика события для переключения на выбранную страницу
+          li.addEventListener('click', function () {
+            paginate(i);
+          });
+          // Добавление элемента списка в пагинацию
+          paginationElement.appendChild(li);
+        }
+      }
+
+      // Функция для отображения данных выбранной страницы
+      function paginate(pageNumber) {
+        const itemsPerPage = 50;
+        const startIndex = (pageNumber - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        // Получение данных для текущей страницы
+        const dataPage = originalData.slice(startIndex, endIndex);
+        // Отображение данных
+        displayData(dataPage);
+        // Настройка пагинации
+        setupPagination(originalData.length);
+        // Обновление текущей страницы
+        currentPage = pageNumber;
+      }
+
+      // Функция для сортировки таблицы
+      function sortTable(columnIndex) {
+        const table = document.querySelector('#dataTable');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        // Определение порядка сортировки (asc или desc)
+        const order =
+          table.rows[0].cells[columnIndex].getAttribute('data-order') === 'asc'
+            ? 'desc'
+            : 'asc';
+
+        // Сортировка строк
+        rows.sort((a, b) => {
+          const aValue = getCellValue(a, columnIndex);
+          const bValue = getCellValue(b, columnIndex);
+
+          // Сравнение значений для определения порядка сортировки
+          const comparison =
+            order === 'asc'
+              ? aValue.localeCompare(bValue)
+              : bValue.localeCompare(aValue);
+
+          return comparison;
+        });
+
+        // Удаление атрибутов сортировки со всех столбцов
+        table
+          .querySelector('thead tr')
+          .querySelectorAll('th')
+          .forEach((cell) => cell.removeAttribute('data-order'));
+        // Установка атрибута сортировки для выбранного столбца
+        table.rows[0].cells[columnIndex].setAttribute('data-order', order);
+
+        // Создание фрагмента для эффективного обновления тела таблицы
+        const fragment = document.createDocumentFragment();
+
+        // Добавление отсортированных строк в фрагмент
+        rows.forEach((row) => fragment.appendChild(row));
+
+        // Очистка тела таблицы и добавление отсортированных строк
+        tbody.innerHTML = '';
+        tbody.appendChild(fragment);
+      }
+
+      // Функция для получения значения ячейки
+      function getCellValue(row, columnIndex) {
+        return row.cells[columnIndex].textContent.trim();
+      }
+    </script>
+  </body>
+</html>

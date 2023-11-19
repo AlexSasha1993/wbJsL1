@@ -1,0 +1,42 @@
+<!-- Взаимодействие с формами: Напишите функцию, которая получает данные из формы на веб-странице и выполняет определенные действия с этими данными, например, отправляет их на сервер или отображает всплывающее окно с результатами. -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form Interaction</title>
+  </head>
+  <body>
+    <form id="myForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required />
+      <br />
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required />
+      <br />
+
+      <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <script>
+      // Функция для обработки данных формы
+      const submitForm = () => {
+        // Получаем элементы формы
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+
+        // Получаем значения из полей формы
+        const name = nameInput.value;
+        const email = emailInput.value;
+
+        // Выполняем определенные действия с данными (в данном случае, выводим в консоль)
+        console.log('Name:', name);
+        console.log('Email:', email);
+
+        alert(`Name: ${name}\nEmail: ${email}`);
+      };
+    </script>
+  </body>
+</html>
